@@ -23,12 +23,12 @@
 
 (define (try . stuff)
   (define msg (messaging-user-full-message))
-  (define cmd (message->command msg))
+  (define cmd (current-command))
   (when (not (string=? cmd "try"))
-    (error "I only understand the commands `! challenge` and `! try`"))
+    (error (~a "I only understand the commands `! challenge` and `! try`. You gave me `!" msg "`")))
   (define user-code-string
     ;This is brittle, and I keep getting errors.  Write more tests.
-    (string-join (message->args msg)
+    (string-join (current-args)
 		 " "))
 
   (define user-code 
