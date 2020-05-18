@@ -1,5 +1,7 @@
 #lang racket
 
+(provide (rename-out [b challenge-bot]))
+
 (require discord-bot)
 (require discourse-bot)
 
@@ -20,12 +22,13 @@
   (serve s))
 
 (define (try . stuff)
+  (define msg (messaging-user-full-message))
+  (define cmd (message->command msg))
+  (when (not (string=? cmd "try"))
+    (error "I only understand the commands `! challenge` and `! try`"))
   (define user-code-string
     ;This is brittle, and I keep getting errors.  Write more tests.
-    (string-join (drop (string-split
-			 (messaging-user-full-message)
-			 "\n")
-		       1)
+    (string-join (message->args msg)
 		 " "))
 
   (define user-code 
