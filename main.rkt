@@ -24,39 +24,39 @@
 (define (try . stuff)
   (define msg (messaging-user-full-message))
   (define cmd (current-command))
-  (when (not (string=? cmd "try"))
-    (error (~a "I only understand the commands `! challenge` and `! try`. You gave me `!" msg "`")))
-  (define user-code-string
-    ;This is brittle, and I keep getting errors.  Write more tests.
-    (string-join (current-args)
-		 " "))
 
-  (define user-code 
-    (read (open-input-string 
-	    (~a "(let ()" user-code-string ")"))))
+  ;(displayln msg)
 
-  (define expected-answer (session-load 
-			    (messaging-user-name) ;Make default?
-			    'expected-answer))
+  (let ()
+    (define user-code-string
+      ;This is brittle, and I keep getting errors.  Write more tests.
+      (string-join (current-args)
+		   " "))
 
-  ;Should we eval??
+    (define user-code 
+      (read (open-input-string 
+	      (~a "(let ()" user-code-string ")"))))
 
-  (list
-    (if (not (equal? user-code `(let () ,@expected-answer)))
+    (define expected-answer (session-load 
+			      (messaging-user-name) ;Make default?
+			      'expected-answer))
+
+    ;Should we eval??
+
+    (list
+      (if (not (equal? user-code `(let () ,@expected-answer)))
 	(~a "Hmmm.  Here's what your code produces.  It's beautiful, but it doesn't look like what I was expecting...") 
 	(~a "You got it!  It looks exactly right! Use `! challenge` to ge a new challenge!"))
 
-    (eval user-code
-	  (module->namespace "lang.rkt"))))
+      (eval user-code
+	    (module->namespace "lang.rkt")))))
 
 (define b 
   (bot 
     ["help" (help-link "https://forum.metacoders.org/t/documentation-challenge-bot/104")]
     ["challenge" challenge]
-    [else try] ;Eval their code and show the image.  Tell them if right or wrong.  If right, suggest they type "! challenge" again.
-    ;  Note, we'll need some kind of "database"...
-    ))
+    ["try" try] 
+    [else void]))
 
 (launch-bot b)
-
 
